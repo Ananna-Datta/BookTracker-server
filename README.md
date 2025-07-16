@@ -30,4 +30,17 @@ A simple Library Management System backend API built with **Express**, **TypeScr
 - MongoDB with Mongoose  
 - ESLint & Prettier (optional for code quality)  
 
----
+---## Setup Instructions
+
+### Prerequisites
+
+- Node.js (v16 or later recommended)  
+- MongoDB instance (local or cloud, e.g. MongoDB Atlas)  
+
+### Installation
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/Ananna-Datta/BookTracker-server.git
+cd BookTracker-server
