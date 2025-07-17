@@ -18,10 +18,13 @@ const borrowBook = async (req: Request, res: Response) => {
       message: "Book borrowed successfully",
       data: borrowRecord,
     });
-  } catch (error: any) {
-    res.status(error.message === "Not enough copies available" || error.message === "Book not found" ? 400 : 500).json({
+  } catch (error: unknown) {
+    const errMsg = error instanceof Error ? error.message : "Borrowing failed";
+    const statusCode = errMsg === "Not enough copies available" || errMsg === "Book not found" ? 400 : 500;
+
+    res.status(statusCode).json({
       success: false,
-      message: error.message || "Borrowing failed",
+      message: errMsg,
       error,
     });
   }
@@ -62,11 +65,13 @@ const getBorrowSummary = async (req: Request, res: Response) => {
       message: "Borrowed books summary retrieved successfully",
       data: summary,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errMsg = error instanceof Error ? error.message : "Failed to retrieve summary";
+
     res.status(500).json({
       success: false,
-      message: "Failed to retrieve summary",
-      error: error.message || error,
+      message: errMsg,
+      error,
     });
   }
 };

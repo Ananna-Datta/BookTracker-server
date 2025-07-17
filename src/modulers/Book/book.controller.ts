@@ -2,6 +2,7 @@ import { Response, Request } from "express";
 import Book from "./book.model";
 import { formatMongooseError } from "../Error/ValidationError";
 import { BookQuery } from "./book.interface";
+import { Error as MongooseError } from "mongoose";
 
 const createBook = async (req: Request, res: Response) => {
   try {
@@ -14,15 +15,15 @@ const createBook = async (req: Request, res: Response) => {
       message: "Book created successfully",
       data,
     });
-  } catch (error: any) {
-    if (error.name === "ValidationError") {
+  } catch (error: unknown) {
+    if (error instanceof MongooseError.ValidationError) {
       return res.status(400).json(formatMongooseError(error));
     }
 
     res.status(500).json({
       success: false,
       message: "Something went wrong",
-      error: error.message || error,
+      error: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };
@@ -31,7 +32,7 @@ const getBook = async (req: Request, res: Response) => {
   try {
     const { filter, sortBy, sort, limit } = req.query as unknown as BookQuery;
 
-    const query: any = {};
+    const query: Record<string, unknown> = {};
     if (filter) {
       query.genre = filter;
     }
@@ -39,7 +40,6 @@ const getBook = async (req: Request, res: Response) => {
     const sortField = Array.isArray(sortBy) ? sortBy[0] : String(sortBy || "createdAt");
     const sortDirection = sort === "desc" ? -1 : 1;
     const limitValue = Number(limit);
-
     const validLimit = !isNaN(limitValue) && limitValue > 0 ? limitValue : 10;
 
     const sortOption: Record<string, 1 | -1> = {
@@ -53,11 +53,11 @@ const getBook = async (req: Request, res: Response) => {
       message: "Books retrieved successfully",
       data,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     res.status(500).json({
       success: false,
       message: "Failed to fetch books",
-      error: error.message || error,
+      error: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };
@@ -80,11 +80,11 @@ const getBookbyId = async (req: Request, res: Response) => {
       message: "Book retrieved successfully",
       data,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     res.status(500).json({
       success: false,
       message: "Failed to fetched book",
-      error: error.message || error,
+      error: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };
@@ -98,7 +98,7 @@ const updateBook = async (req: Request, res: Response) => {
       bookId,
       updateData,
       {
-        new: true,         
+        new: true,
         runValidators: true,
       }
     );
@@ -115,11 +115,11 @@ const updateBook = async (req: Request, res: Response) => {
       message: "Book updated successfully",
       data,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     res.status(500).json({
       success: false,
       message: "Failed to update book",
-      error: error.message || error,
+      error: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };
@@ -142,14 +142,13 @@ const deleteBook = async (req: Request, res: Response) => {
       message: "Book deleted successfully",
       data,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     res.status(500).json({
       success: false,
       message: "Failed to delete book",
-      error: error.message || error,
+      error: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };
 
-
-export { createBook, getBook, deleteBook,getBookbyId,updateBook };
+export { createBook, getBook, deleteBook, getBookbyId, updateBook };
