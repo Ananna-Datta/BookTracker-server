@@ -30,8 +30,9 @@ app.listen(config_1.default.port, () => {
 function server() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            yield mongoose_1.default.connect(config_1.default.database_url);
-            console.log("Connected to database");
+            yield mongoose_1.default.connect(config_1.default.database_url, {
+                serverSelectionTimeoutMS: 30000, // optional: increase timeout
+            });
         }
         catch (error) {
             console.error("Database connection error:", error);

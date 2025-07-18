@@ -20,8 +20,9 @@ app.listen(config.port, () => {
 
 async function server() {
   try {
-    await mongoose.connect(config.database_url!);
-    console.log("Connected to database");
+    await mongoose.connect(config.database_url!, {
+      serverSelectionTimeoutMS: 30000, // optional: increase timeout
+    });
   } catch (error) {
     console.error("Database connection error:", error);
   }
